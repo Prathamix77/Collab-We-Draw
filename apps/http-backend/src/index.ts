@@ -1,15 +1,16 @@
 import express from "express"
 import cors from "cors"
-import jwt from "jsonwebtoken"
+import * as jwt  from "jsonwebtoken"
 import {prismaClient} from "@repo/db/client"
 // import { Middleware } from "./middleware";
 import {CreateRoomSchema , CreateUserSchema , SignInSchema} from "@repo/backend-common/types"
 import {JWT_SECRET} from "@repo/auth/auth"
+import { Middleware } from "./middleware"
 
 const app = express();
 
-app.use(express.json())
 app.use(cors())
+app.use(express.json())
 
 app.post("/Signup" , async (req,res) => {
 
@@ -71,7 +72,7 @@ app.post("/Signin" , async (req,res)=> {
     }
 
    const token =  jwt.sign({
-        username : user.id,
+        userId : user.id,
     }, JWT_SECRET)
     
     
@@ -83,8 +84,10 @@ app.post("/Signin" , async (req,res)=> {
 })
 
 
-app.post("/Room"  , async (req,res)=> {
+app.post("/RoomCreate" , Middleware , async (req,res)=> {
+
     const parsedData = CreateRoomSchema.safeParse(req.body);
+
     if(!parsedData.success) {
         
       res.json({
@@ -93,14 +96,21 @@ app.post("/Room"  , async (req,res)=> {
       return 
     }
 
-    // const userId = req.userId
+
+    const url = req.url
+    console.log(url);
+    
+    const userId = req?.userId
+
+    console.log(userId)
+    
 
     try{
     const room = await prismaClient.room.create({
         //@ts-ignore
         data :{
             slug: parsedData.data.name,
-            AdminId : "Pratham",
+            AdminId : userId,
             
         }
         
@@ -111,6 +121,10 @@ app.post("/Room"  , async (req,res)=> {
           message : "Room Exists"
         })
     }
+
+    res.json(({
+        userId,
+    }))
 
 })
 

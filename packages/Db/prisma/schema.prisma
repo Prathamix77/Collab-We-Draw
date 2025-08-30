@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  output   = "../src/generated/client"
 }
 
 datasource db {
@@ -21,7 +21,7 @@ chat          Chat[]
 
 model Room {
   
-id          String          @id
+id          String         @id
 slug        String         @unique
 createdAt   DateTime        @default(now())
 AdminId     String        

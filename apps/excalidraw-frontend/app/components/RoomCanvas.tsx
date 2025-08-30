@@ -4,6 +4,7 @@ import { WS_BACKEND } from "../config";
 import {Canvas} from "./Canvas";
 
 
+
 interface RoomCanvasProps {
     roomId : string,
     token : string
@@ -15,17 +16,22 @@ export function RoomCanvas({roomId , token} : RoomCanvasProps) {
   
     useEffect(()=> {
         const ws = new WebSocket(`${WS_BACKEND}?token=${token}`)
-        ws.onopen = () =>{
+        console.log(`${WS_BACKEND}?token=${token}`);
+        
+        ws.onopen = (event) =>{
             setSocket(ws)
+            console.log("you are connected to websocket");
             
             ws.send(JSON.stringify({
                 type : "join_room",
                 roomId : roomId,
-            }))
-        }
 
-    },[])
-    console.log(socket);
+            }))
+        },[]})
+    
+
+    
+        
   
     if(!socket) {
         return <div>
